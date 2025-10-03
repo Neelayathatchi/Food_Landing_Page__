@@ -1,0 +1,704 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FlavorForge: Ultimate Luxury Dining Experience</title>
+    <!-- Load Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Load required fonts: Playfair Display for headers, Inter for body -->
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;900&family=Inter:wght@300;400;700;900&display=swap" rel="stylesheet">
+
+    <script>
+        // Tailwind Configuration to define custom colors and fonts for the luxury theme
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        // Adjusted Yellow for maximum pop and contrast
+                        'primary-yellow': '#FFD700', // Gold/Bright Yellow Accent
+                        'secondary-yellow': '#FFEA4C', // Lighter Highlight
+                        'bg-charcoal': '#131313', // Deep Background
+                        'bg-dark-secondary': '#1D1D1D', // Card/Section Background
+                        'text-light': '#F5F5F5',
+                        'text-soft': '#A0A0A0',
+                    },
+                    fontFamily: {
+                        'serif': ['Playfair Display', 'serif'],
+                        'sans': ['Inter', 'sans-serif'],
+                    },
+                },
+            }
+        }
+    </script>
+
+    <style>
+        /* Apply custom fonts globally */
+        
+        body {
+            font-family: theme('fontFamily.sans');
+            color: theme('colors.text-light');
+            overflow-x: hidden;
+            /* Prevent horizontal scroll from subtle hovers */
+        }
+        
+        h1,
+        h2,
+        h3,
+        h4 {
+            font-family: theme('fontFamily.serif');
+        }
+        /* Logo Styling */
+        
+        .logo-text {
+            font-size: 2.25rem;
+            /* text-3xl */
+            line-height: 1;
+            display: inline-flex;
+            align-items: center;
+        }
+        /* Menu Section Background Style (subtle dark pattern) */
+        
+        .menu-background {
+            background-color: theme('colors.bg-dark-secondary');
+            background-image: linear-gradient(0deg, transparent 24%, rgba(255, 255, 255, 0.03) 25%, rgba(255, 255, 255, 0.03) 26%, transparent 27%), linear-gradient(90deg, transparent 24%, rgba(255, 255, 255, 0.03) 25%, rgba(255, 255, 255, 0.03) 26%, transparent 27%);
+            background-size: 40px 40px;
+        }
+        /* Menu Item Dot Leader Styling */
+        
+        .menu-list-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            margin-bottom: 20px;
+            transition: color 0.3s;
+        }
+        
+        .menu-list-item:hover .text-2xl {
+            color: theme('colors.primary-yellow');
+        }
+        
+        .menu-dots {
+            flex-grow: 1;
+            height: 1px;
+            /* Use a finer, dashed line for elegance */
+            border-bottom: 1px dashed theme('colors.text-soft');
+            margin: 0 10px;
+        }
+        /* Custom glow shadow for featured elements/hover state */
+        
+        .glow-shadow {
+            box-shadow: 0 0 15px rgba(255, 215, 0, 0.4), 0 0 5px rgba(255, 215, 0, 0.2);
+        }
+        
+        .glow-hover:hover {
+            box-shadow: 0 0 20px rgba(255, 215, 0, 0.6), 0 0 10px rgba(255, 215, 0, 0.3);
+            transform: translateY(-3px) scale(1.01);
+        }
+        /* ========================================
+        VIDEO PLAYER STYLES (Lite Embed) 
+        ========================================
+        */
+        
+        .video-container {
+            position: relative;
+            width: 100%;
+            padding-bottom: 56.25%;
+            /* 16:9 Aspect Ratio */
+            height: 0;
+            overflow: hidden;
+            border-radius: 0.75rem;
+        }
+        
+        .youtube-lite-embed {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            cursor: pointer;
+            border-radius: 0.75rem;
+        }
+        
+        .youtube-lite-embed img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: 0.75rem;
+            /* Ensure rounded corners on the placeholder image */
+        }
+        
+        .youtube-lite-embed .play-button {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 80px;
+            height: 80px;
+            transition: transform 0.3s ease-in-out;
+            filter: drop-shadow(0 0 5px rgba(255, 215, 0, 0.8));
+            /* Added circular dark background for contrast */
+            background: rgba(0, 0, 0, 0.6);
+            border-radius: 50%;
+            padding: 15px;
+        }
+        
+        .youtube-lite-embed:hover .play-button {
+            transform: translate(-50%, -50%) scale(1.1);
+        }
+        
+        .video-container iframe {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            border-radius: 0.75rem;
+        }
+    </style>
+
+    <script>
+        /**
+         * Lite YouTube Embed implementation.
+         * This function replaces a static image placeholder with the live YouTube iframe 
+         * only when the user clicks the play button, improving initial page load performance.
+         */
+        const loadYouTubePlayer = (elementId) => {
+            const container = document.getElementById(elementId);
+            if (!container) return;
+
+            // Get the video ID from the data attribute
+            const videoId = container.getAttribute('data-video-id');
+            if (!videoId) return;
+
+            // Create the iframe element
+            const iframe = document.createElement('iframe');
+            // Autoplay is set to 1 to start the video immediately after the user clicks the thumbnail
+            iframe.setAttribute('src', `https://www.youtube.com/embed/${videoId}?autoplay=1&rel=0&modestbranding=1`);
+            iframe.setAttribute('frameborder', '0');
+            iframe.setAttribute('allow', 'accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture');
+            iframe.setAttribute('allowfullscreen', '');
+            iframe.setAttribute('title', 'Culinary Demonstration Video');
+
+            // Clear the static content and append the iframe
+            container.innerHTML = '';
+            container.classList.remove('youtube-lite-embed'); // Remove lite-embed class
+            container.appendChild(iframe);
+        };
+
+        // Ensure the click listener is attached once the DOM is ready
+        window.onload = function() {
+            const player = document.getElementById('youtube-player');
+            if (player) {
+                // Attach the load function to the click event on the placeholder div
+                player.addEventListener('click', () => loadYouTubePlayer('youtube-player'));
+            }
+        };
+    </script>
+</head>
+
+<body class="bg-bg-charcoal">
+
+    <!-- ======================================== -->
+    <!-- NAVIGATION BAR -->
+    <!-- ======================================== -->
+    <header class="fixed top-0 left-0 w-full z-50 bg-bg-charcoal/95 backdrop-blur-sm shadow-xl border-b border-gray-800">
+        <div class="container mx-auto px-4 sm:px-6 lg:px-8 flex justify-between items-center py-5">
+            <a href="#" class="logo-text font-serif font-black text-primary-yellow">
+                <!-- Custom Bright Yellow SVG Logo: Flame and Dot for the "Forge" concept -->
+                <svg class="w-8 h-8 mr-2 transform rotate-[-10deg]" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path fill-rule="evenodd" clip-rule="evenodd" d="M12 2C10 4 8 8 8 12C8 16 12 22 12 22C12 22 16 16 16 12C16 8 14 4 12 2ZM12 19C10.5 17 9.5 14.5 9.5 12C9.5 9.5 10.5 7 12 5.5C13.5 7 14.5 9.5 14.5 12C14.5 14.5 13.5 17 12 19Z" fill="#FFD700"/>
+                    <circle cx="12" cy="12" r="1.5" fill="#131313"/>
+                </svg> FlavorForge
+            </a>
+            <nav class="hidden lg:flex space-x-8">
+                <!-- Links with Underline Hover Effect -->
+                <a href="#services" class="text-text-light hover:text-primary-yellow transition duration-300 uppercase tracking-wider text-sm relative before:content-[''] before:absolute before:bottom-0 before:left-0 before:w-0 before:h-0.5 before:bg-primary-yellow before:transition-all before:duration-300 hover:before:w-full">Services</a>
+                <a href="#featured" class="text-text-light hover:text-primary-yellow transition duration-300 uppercase tracking-wider text-sm relative before:content-[''] before:absolute before:bottom-0 before:left-0 before:w-0 before:h-0.5 before:bg-primary-yellow before:transition-all before:duration-300 hover:before:w-full">Featured</a>
+                <a href="#menu" class="text-text-light hover:text-primary-yellow transition duration-300 uppercase tracking-wider text-sm relative before:content-[''] before:absolute before:bottom-0 before:left-0 before:w-0 before:h-0.5 before:bg-primary-yellow before:transition-all before:duration-300 hover:before:w-full">Menu</a>
+                <a href="#plans" class="text-text-light hover:text-primary-yellow transition duration-300 uppercase tracking-wider text-sm relative before:content-[''] before:absolute before:bottom-0 before:left-0 before:w-0 before:h-0.5 before:bg-primary-yellow before:transition-all before:duration-300 hover:before:w-full">Pricing</a>
+                <a href="#blog" class="text-text-light hover:text-primary-yellow transition duration-300 uppercase tracking-wider text-sm relative before:content-[''] before:absolute before:bottom-0 before:left-0 before:w-0 before:h-0.5 before:bg-primary-yellow before:transition-all before:duration-300 hover:before:w-full">Blog</a>
+            </nav>
+            <button class="py-2 px-6 bg-primary-yellow text-bg-charcoal font-bold rounded-full hover:bg-secondary-yellow transition duration-300 shadow-lg hover:shadow-xl hidden lg:block">
+                Book a Meal Kit
+            </button>
+            <button class="lg:hidden text-2xl text-primary-yellow hover:text-secondary-yellow">
+                <!-- Menu Icon -->
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7" />
+                </svg>
+            </button>
+        </div>
+    </header>
+
+    <!-- ======================================== -->
+    <!-- 1. HERO SECTION (WITH PERSON/CHEF) -->
+    <!-- ======================================== -->
+    <section class="relative h-[85vh] flex items-center justify-center text-center bg-cover bg-center" style="background-image: url('https://i.pinimg.com/736x/97/39/04/9739040dd0e8b748d312fb8cd3d101b4.jpg'); padding-top: 80px;">
+        <div class="absolute inset-0 bg-black/75"></div>
+        <!-- Dark Overlay -->
+
+        <div class="container max-w-5xl z-10 p-6 sm:p-10">
+            <h1 class="text-7xl sm:text-9xl font-serif font-black mb-6 leading-none tracking-tight">
+                <span class="text-primary-yellow block sm:inline">Taste</span> The Art of Home Dining
+            </h1>
+            <p class="text-xl sm:text-2xl text-text-light mb-12 max-w-3xl mx-auto font-black">
+                Every ingredient is sourced, prepared, and packaged by our Michelin-trained chefs for your effortless kitchen masterpiece.
+            </p>
+            <!-- Enhanced CTA Button with dynamic shadow -->
+            <a href="#plans" class="inline-block py-4 px-12 bg-primary-yellow text-bg-charcoal text-xl font-extrabold uppercase rounded-full shadow-2xl hover:bg-secondary-yellow transition duration-300 transform hover:scale-105 glow-shadow">
+                Discover Our Kits
+            </a>
+        </div>
+    </section>
+
+    <!-- ======================================== -->
+    <!-- 2. "WE PROVIDE BEST SERVICES" SECTION -->
+    <!-- ======================================== -->
+    <section class="py-24 bg-bg-dark-secondary" id="services">
+        <div class="container mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-16">
+                <p class="text-lg text-primary-yellow font-serif uppercase tracking-widest mb-2">Service Excellence</p>
+                <h2 class="text-5xl font-serif font-black">We Provide the Best Services</h2>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-10">
+                <!-- Service Card 1: Added glow-hover class -->
+                <div class="bg-bg-charcoal p-8 rounded-xl text-center shadow-xl border-t-4 border-primary-yellow transition duration-300 glow-hover">
+                    <span class="text-5xl text-primary-yellow mb-4 block">🔪</span>
+                    <h3 class="text-2xl font-serif font-bold mb-3">Chef-Prepared Ingredients</h3>
+                    <p class="text-text-soft">All components are cleaned, chopped, and portioned by our team, saving you hours of prep time.</p>
+                </div>
+                <!-- Service Card 2: Added glow-hover class -->
+                <div class="bg-bg-charcoal p-8 rounded-xl text-center shadow-xl border-t-4 border-primary-yellow transition duration-300 glow-hover">
+                    <span class="text-5xl text-primary-yellow mb-4 block">🌎</span>
+                    <h3 class="text-2xl font-serif font-bold mb-3">Global Sourcing, Local Delivery</h3>
+                    <p class="text-text-soft">We use rare, ethical, and seasonal ingredients sourced from top global producers.</p>
+                </div>
+                <!-- Service Card 3: Added glow-hover class -->
+                <div class="bg-bg-charcoal p-8 rounded-xl text-center shadow-xl border-t-4 border-primary-yellow transition duration-300 glow-hover">
+                    <span class="text-5xl text-primary-yellow mb-4 block">📚</span>
+                    <h3 class="text-2xl font-serif font-bold mb-3">Masterclass Recipe Cards</h3>
+                    <p class="text-text-soft">Each kit includes a detailed, easy-to-follow card designed to teach professional techniques.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ======================================== -->
+    <!-- 3. "GOOD FOOD, DRINKS, AND GREAT COMPANY" (CHEF IMAGE) -->
+    <!-- ======================================== -->
+    <section class="py-24" id="chef">
+        <div class="container mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="lg:flex lg:space-x-16 items-center">
+                <div class="lg:w-1/2 mb-10 lg:mb-0">
+                    <img src="https://images.unsplash.com/photo-1577219491135-ce391730fb2c?fm=jpg&q=60&w=3000&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8NHx8Y2hlZnxlbnwwfHwwfHx8MA%3D%3D" alt="Head Chef of FlavorForge" class="w-full h-auto object-cover rounded-xl shadow-2xl border-4 border-primary-yellow/50 transition duration-500 hover:scale-[1.01]">
+                </div>
+                <div class="lg:w-1/2">
+                    <p class="text-lg text-primary-yellow font-serif uppercase tracking-widest mb-3">The FlavorForge Experience</p>
+                    <h2 class="text-5xl font-serif font-black mb-6">
+                        Good Food, Drinks, and <span class="text-primary-yellow">Great Company.</span>
+                    </h2>
+                    <p class="text-text-soft mb-6 text-lg">
+                        Dining is more than sustenance; it's a shared ritual. Our kits are crafted not just for flavor, but to create memorable moments, effortlessly bringing restaurant-quality ambiance to your home.
+                    </p>
+                    <ul class="space-y-4 text-text-light font-semibold mb-8">
+                        <li class="flex items-center">
+                            <span class="text-primary-yellow text-2xl mr-3">✓</span> Weekly Sommelier Pairings
+                        </li>
+                        <li class="flex items-center">
+                            <span class="text-primary-yellow text-2xl mr-3">✓</span> Customizable Portion Sizes
+                        </li>
+                        <li class="flex items-center">
+                            <span class="text-primary-yellow text-2xl mr-3">✓</span> Access to Exclusive Ingredient Add-ons
+                        </li>
+                    </ul>
+                    <a href="#contact" class="inline-block py-3 px-8 bg-transparent border-2 border-primary-yellow text-primary-yellow font-bold uppercase rounded-full hover:bg-primary-yellow hover:text-bg-charcoal transition duration-300">
+                        Ask the Chef
+                    </a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ======================================== -->
+    <!-- 4. FOOD MENU SECTION (IMPRESSIVE, DIFFERENT BACKGROUND) -->
+    <!-- ======================================== -->
+    <section class="py-24 menu-background" id="menu">
+        <div class="container mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-16">
+                <p class="text-lg text-primary-yellow font-serif uppercase tracking-widest mb-2">This Month's Roster</p>
+                <h2 class="text-5xl font-serif font-black">Our Exquisite Menu</h2>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-x-16 gap-y-12 max-w-5xl mx-auto">
+
+                <!-- Appetizers & Soups -->
+                <div>
+                    <h3 class="text-3xl font-serif font-black text-primary-yellow mb-6 border-b-2 border-primary-yellow pb-2">Appetizers & Soups</h3>
+
+                    <!-- Menu Item 1: Added hover effect on list item -->
+                    <div class="menu-list-item cursor-default hover:text-primary-yellow transition duration-300">
+                        <div class="flex flex-col">
+                            <h4 class="text-2xl font-serif font-bold text-text-light transition duration-300 hover:text-primary-yellow">Seared Scallops with Uni Butter</h4>
+                            <p class="text-sm text-text-soft italic">Yuzu glaze, microgreens, sea salt flakes.</p>
+                        </div>
+                        <div class="menu-dots"></div>
+                        <span class="text-2xl font-serif text-primary-yellow font-black">$32</span>
+                    </div>
+
+                    <!-- Menu Item 2 -->
+                    <div class="menu-list-item cursor-default hover:text-primary-yellow transition duration-300">
+                        <div class="flex flex-col">
+                            <h4 class="text-2xl font-serif font-bold text-text-light transition duration-300 hover:text-primary-yellow">French Onion Consommé</h4>
+                            <p class="text-sm text-text-soft italic">Gruyere crouton, slow-simmered beef stock.</p>
+                        </div>
+                        <div class="menu-dots"></div>
+                        <span class="text-2xl font-serif text-primary-yellow font-black">$22</span>
+                    </div>
+                </div>
+
+                <!-- Main Courses -->
+                <div>
+                    <h3 class="text-3xl font-serif font-black text-primary-yellow mb-6 border-b-2 border-primary-yellow pb-2">Main Courses</h3>
+
+                    <!-- Menu Item 3 -->
+                    <div class="menu-list-item cursor-default hover:text-primary-yellow transition duration-300">
+                        <div class="flex flex-col">
+                            <h4 class="text-2xl font-serif font-bold text-text-light transition duration-300 hover:text-primary-yellow">Truffle-Crusted Lamb Loin</h4>
+                            <p class="text-sm text-text-soft italic">Potatoes dauphinoise, rosemary demi-glace.</p>
+                        </div>
+                        <div class="menu-dots"></div>
+                        <span class="text-2xl font-serif text-primary-yellow font-black">$58</span>
+                    </div>
+
+                    <!-- Menu Item 4 -->
+                    <div class="menu-list-item cursor-default hover:text-primary-yellow transition duration-300">
+                        <div class="flex flex-col">
+                            <h4 class="text-2xl font-serif font-bold text-text-light transition duration-300 hover:text-primary-yellow">Saffron Tagliatelle with Lobster</h4>
+                            <p class="text-sm text-text-soft italic">Hand-made pasta, brandy cream sauce.</p>
+                        </div>
+                        <div class="menu-dots"></div>
+                        <span class="text-2xl font-serif text-primary-yellow font-black">$65</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ======================================== -->
+    <!-- 5. NEW WEEK FEATURED SECTION -->
+    <!-- ======================================== -->
+    <section class="py-24" id="featured">
+        <div class="container mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-16">
+                <p class="text-lg text-primary-yellow font-serif uppercase tracking-widest mb-2">Limited Time Only</p>
+                <h2 class="text-5xl font-serif font-black">This Week's Featured Meal</h2>
+            </div>
+
+            <!-- Added glow-shadow class to the featured card -->
+            <div class="bg-bg-dark-secondary rounded-xl overflow-hidden shadow-2xl lg:flex glow-shadow">
+                <div class="lg:w-1/2">
+                    <img src="https://img.freepik.com/premium-psd/psd-menu-restaurant_790618-82.jpg" alt="Featured Dish: A5 Wagyu & Shiitake Duxelles" class="w-full h-full object-cover transition duration-500 hover:scale-[1.05]">
+                </div>
+                <div class="lg:w-1/2 p-10 md:p-16 flex flex-col justify-center">
+                    <h3 class="text-5xl font-serif font-black mb-4 leading-snug">
+                        A5 Wagyu & <span class="text-primary-yellow">Shiitake Duxelles</span>
+                    </h3>
+                    <p class="text-text-soft text-lg mb-6">
+                        Experience the unparalleled marbling of genuine Japanese Wagyu. This kit includes a secret blend of herbs, homemade Shiitake duxelles paste, and detailed instructions for the perfect sear.
+                    </p>
+                    <ul class="space-y-3 text-text-light mb-10">
+                        <li class="flex items-center">
+                            <span class="text-primary-yellow text-2xl mr-3">★</span> Ingredient highlight: Grade 9+ A5 Wagyu
+                        </li>
+                        <li class="flex items-center">
+                            <span class="text-primary-yellow text-2xl mr-3">★</span> Perfect for: Date Night / Celebration
+                        </li>
+                    </ul>
+                    <div class="flex items-center space-x-4">
+                        <span class="text-4xl font-serif font-black text-primary-yellow">$110 / Kit</span>
+                        <!-- Enhanced CTA Button -->
+                        <a href="#plans" class="py-3 px-8 bg-primary-yellow text-bg-charcoal font-bold rounded-full hover:bg-secondary-yellow transition duration-300 transform hover:scale-105">
+                            Add to Cart
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ======================================== -->
+    <!-- 6. YOUTUBE VIDEO SECTION -->
+    <!-- ======================================== -->
+    <section class="py-24 bg-bg-dark-secondary">
+        <div class="container mx-auto px-4 sm:px-6 lg:px-8 max-w-4xl">
+            <div class="text-center mb-12">
+                <p class="text-lg text-primary-yellow font-serif uppercase tracking-widest mb-2">Masterclass Demonstration</p>
+                <h2 class="text-5xl font-serif font-black mb-4">Behind the <span class="text-primary-yellow">Culinary Curtain</span></h2>
+                <p class="text-text-soft text-lg max-w-2xl mx-auto">
+                    Watch our Head Chef, Auguste, demonstrate the simple secrets to mastering the perfect risotto using our exclusive kit.
+                </p>
+            </div>
+
+            <div class="video-container shadow-2xl glow-shadow">
+                <!-- Lite YouTube Embed Placeholder: The div with the static image loads first -->
+                <div id="youtube-player" data-video-id="P1eYv-pz9Lc" class="youtube-lite-embed">
+                    <!-- Custom Cover Image (using the uploaded file: image_80cf85.jpg) -->
+                    <img src="https://img.freepik.com/free-vector/drawn-recipes-youtube-thumbnail_23-2148926454.jpg?semt=ais_hybrid&w=740" alt="Video Thumbnail of Chef making Risotto" class="w-full h-full object-cover rounded-xl" loading="lazy">
+
+                    <!-- Custom Gold Play Button Overlay (SVG for style and sharp scaling) -->
+                    <svg class="play-button" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="#FFD700">
+                        <path d="M7 6V18L18 12L7 6Z"/>
+                    </svg>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ======================================== -->
+    <!-- 7. BLOG ALL ABOUT FOOD SECTION -->
+    <!-- ======================================== -->
+    <section class="py-24" id="blog">
+        <div class="container mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-16">
+                <p class="text-lg text-primary-yellow font-serif uppercase tracking-widest mb-2">Read & Learn</p>
+                <h2 class="text-5xl font-serif font-black">Blog About Food</h2>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <!-- Blog Post 1: Added glow-hover class -->
+                <div class="bg-bg-dark-secondary rounded-xl overflow-hidden shadow-xl border-t-2 border-transparent hover:border-primary-yellow transition duration-300 glow-hover">
+                    <img src="https://img.etimg.com/thumb/msid-120892278,width-480,height-360,imgsize-2298685,resizemode-75/himalayan-pink-salt-the-mineral-powerhouse.jpg" alt="The Science of Sourcing the Perfect Sea Salt" class="w-full h-48 object-cover">
+                    <div class="p-6">
+                        <p class="text-primary-yellow text-sm font-semibold mb-2">INGREDIENTS</p>
+                        <h3 class="text-2xl font-serif font-bold mb-3 hover:text-primary-yellow transition duration-300 cursor-pointer">
+                            The Science of Sourcing the Perfect Sea Salt
+                        </h3>
+                        <p class="text-text-soft text-sm">A deep dive into French salt marshes and why texture matters.</p>
+                        <a href="#" class="mt-4 inline-block text-primary-yellow font-semibold text-sm relative before:content-['→'] before:absolute before:-right-4 before:opacity-0 hover:before:opacity-100 before:transition-all before:duration-300 hover:pr-5">Read Article</a>
+                    </div>
+                </div>
+                <!-- Blog Post 2: Added glow-hover class -->
+                <div class="bg-bg-dark-secondary rounded-xl overflow-hidden shadow-xl border-t-2 border-transparent hover:border-primary-yellow transition duration-300 glow-hover">
+                    <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSFSk2F35ULwu1_Qibv00j-bD1bfzstRypUzg&s" alt="5 Underrated Wines for Red Meat Kits" class="w-full h-48 object-cover">
+                    <div class="p-6">
+                        <p class="text-primary-yellow text-sm font-semibold mb-2">WINE PAIRING</p>
+                        <h3 class="text-2xl font-serif font-bold mb-3 hover:text-primary-yellow transition duration-300 cursor-pointer">
+                            5 Underrated Wines for Red Meat Kits
+                        </h3>
+                        <p class="text-text-soft text-sm">Moving beyond Cabernet: explore our sommelier's new favorites.</p>
+                        <a href="#" class="mt-4 inline-block text-primary-yellow font-semibold text-sm relative before:content-['→'] before:absolute before:-right-4 before:opacity-0 hover:before:opacity-100 before:transition-all before:duration-300 hover:pr-5">Read Article</a>
+                    </div>
+                </div>
+                <!-- Blog Post 3: Added glow-hover class -->
+                <div class="bg-bg-dark-secondary rounded-xl overflow-hidden shadow-xl border-t-2 border-transparent hover:border-primary-yellow transition duration-300 glow-hover">
+                    <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSLVDxiKoAWi7QneKYKe_zaXPnk9lvfdBgYAQ&s" alt="Master the Art of the Reverse Sear" class="w-full h-48 object-cover">
+                    <div class="p-6">
+                        <p class="text-primary-yellow text-sm font-semibold mb-2">TECHNIQUE</p>
+                        <h3 class="text-2xl font-serif font-bold mb-3 hover:text-primary-yellow transition duration-300 cursor-pointer">
+                            Master the Art of the Reverse Sear
+                        </h3>
+                        <p class="text-text-soft text-sm">A foolproof guide to achieving perfectly cooked proteins every time.</p>
+                        <a href="#" class="mt-4 inline-block text-primary-yellow font-semibold text-sm relative before:content-['→'] before:absolute before:-right-4 before:opacity-0 hover:before:opacity-100 before:transition-all before:duration-300 hover:pr-5">Read Article</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ======================================== -->
+    <!-- 8. "AFFORDABLE PRICE" SECTION (CUTE STYLE) -->
+    <!-- ======================================== -->
+    <section class="py-24 bg-bg-dark-secondary" id="plans">
+        <div class="container mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-16">
+                <p class="text-lg text-primary-yellow font-serif uppercase tracking-widest mb-2">Best Value for Quality</p>
+                <h2 class="text-5xl font-serif font-black">Best and <span class="text-primary-yellow">Affordable Pricing</span></h2>
+
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-6xl mx-auto">
+
+                <!-- Plan 1: The Starter Kit (Added glow-hover) -->
+                <div class="bg-bg-charcoal p-8 rounded-3xl text-center border-4 border-primary-yellow/20 transition duration-500 hover:scale-[1.03] shadow-2xl glow-hover">
+                    <h3 class="text-3xl font-serif font-black text-primary-yellow mb-2">The Apprentice</h3>
+                    <p class="text-text-soft mb-6">Perfect for the curious cook.</p>
+
+                    <div class="bg-primary-yellow/10 p-6 rounded-full inline-block mb-8">
+                        <span class="text-6xl font-serif font-black text-primary-yellow">$16</span>
+                        <span class="text-xl text-text-light">/meal</span>
+                    </div>
+
+                    <ul class="text-left space-y-3 mb-8 text-text-light">
+                        <li class="flex items-center"><span class="text-primary-yellow text-2xl mr-3">✓</span> 2 Recipes / Week</li>
+                        <li class="flex items-center"><span class="text-primary-yellow text-2xl mr-3">✓</span> Classic Ingredient Selection</li>
+                        <li class="flex items-center"><span class="text-primary-yellow text-2xl mr-3">✓</span> Flexible Pause/Skip</li>
+                    </ul>
+                    <a href="#" class="inline-block w-full py-4 bg-primary-yellow text-bg-charcoal text-lg font-extrabold rounded-full hover:bg-secondary-yellow transition duration-300">
+                        Get Started
+                    </a>
+                </div>
+
+                <!-- Plan 2: The Chef's Choice (Featured - Enhanced Glow) -->
+                <div class="bg-primary-yellow text-bg-charcoal p-10 rounded-3xl text-center border-4 border-secondary-yellow shadow-2xl ring-4 ring-secondary-yellow/50 transition duration-500 transform scale-[1.05] z-10 glow-shadow">
+                    <h3 class="text-4xl font-serif font-black mb-2">The Master</h3>
+                    <p class="font-bold mb-6">Our most popular and best value!</p>
+
+                    <div class="bg-bg-charcoal/90 p-6 rounded-full inline-block mb-8">
+                        <span class="text-7xl font-serif font-black text-primary-yellow">$12</span>
+                        <span class="text-xl text-text-light">/meal</span>
+                    </div>
+
+                    <ul class="text-left space-y-4 mb-10 font-bold">
+                        <li class="flex items-center"><span class="text-bg-charcoal text-2xl mr-3">✨</span> 4 Recipes / Week</li>
+                        <li class="flex items-center"><span class="text-bg-charcoal text-2xl mr-3">✨</span> **Exclusive Weekly Ingredient**</li>
+                        <li class="flex items-center"><span class="text-bg-charcoal text-2xl mr-3">✨</span> Wine Pairing Notes Included</li>
+                        <li class="flex items-center"><span class="text-bg-charcoal text-2xl mr-3">✨</span> Free Shipping Forever</li>
+                    </ul>
+                    <a href="#" class="inline-block w-full py-4 bg-bg-charcoal text-primary-yellow text-xl font-extrabold rounded-full border-2 border-bg-charcoal hover:opacity-90 transition duration-300">
+                        Select Master Plan
+                    </a>
+                </div>
+
+                <!-- Plan 3: The Family Feast (Added glow-hover) -->
+                <div class="bg-bg-charcoal p-8 rounded-3xl text-center border-4 border-primary-yellow/20 transition duration-500 hover:scale-[1.03] shadow-2xl glow-hover">
+                    <h3 class="text-3xl font-serif font-black text-primary-yellow mb-2">The Family</h3>
+                    <p class="text-text-soft mb-6">Designed for larger households.</p>
+
+                    <div class="bg-primary-yellow/10 p-6 rounded-full inline-block mb-8">
+                        <span class="text-6xl font-serif font-black text-primary-yellow">$11</span>
+                        <span class="text-xl text-text-light">/meal</span>
+                    </div>
+
+                    <ul class="text-left space-y-3 mb-8 text-text-light">
+                        <li class="flex items-center"><span class="text-primary-yellow text-2xl mr-3">✓</span> 5 Recipes / Week</li>
+                        <li class="flex items-center"><span class="text-primary-yellow text-2xl mr-3">✓</span> Serves 4-6 People</li>
+                        <li class="flex items-center"><span class="text-primary-yellow text-2xl mr-3">✓</span> Family-Friendly Options</li>
+                    </ul>
+                    <a href="#" class="inline-block w-full py-4 bg-primary-yellow text-bg-charcoal text-lg font-extrabold rounded-full hover:bg-secondary-yellow transition duration-300">
+                        Select Plan
+                    </a>
+                </div>
+
+            </div>
+        </div>
+    </section>
+
+    <!-- ======================================== -->
+    <!-- 9. LATEST NEWS & 10. TESTIMONIALS SECTION -->
+    <!-- Combined Section -->
+    <!-- ======================================== -->
+    <section class="py-24 grid grid-cols-1 lg:grid-cols-2 gap-12" id="news-reviews">
+
+        <!-- LATEST NEWS (Left Column) -->
+        <div class="px-4 sm:px-6 lg:px-8">
+            <p class="text-lg text-primary-yellow font-serif uppercase tracking-widest mb-2">Updates</p>
+            <h2 class="text-5xl font-serif font-black mb-10">Our Latest News</h2>
+
+            <div class="space-y-6">
+                <!-- News Item 1: Enhanced hover state -->
+                <div class="p-5 bg-bg-dark-secondary rounded-lg border-l-4 border-primary-yellow hover:bg-bg-dark-secondary/80 transition duration-300 cursor-pointer transform hover:translate-x-1">
+                    <p class="text-sm text-text-soft">Oct 3, 2025</p>
+                    <h4 class="text-xl font-serif font-bold hover:text-primary-yellow transition duration-300">
+                        Seasonal Launch: Introducing Our Autumn Truffle Collection
+                    </h4>
+                </div>
+                <!-- News Item 2 -->
+                <div class="p-5 bg-bg-dark-secondary rounded-lg border-l-4 border-primary-yellow hover:bg-bg-dark-secondary/80 transition duration-300 cursor-pointer transform hover:translate-x-1">
+                    <p class="text-sm text-text-soft">Sep 28, 2025</p>
+                    <h4 class="text-xl font-serif font-bold hover:text-primary-yellow transition duration-300">
+                        Chef Auguste featured in "Global Gastronomy Monthly"
+                    </h4>
+                </div>
+                <!-- News Item 3 -->
+                <div class="p-5 bg-bg-dark-secondary rounded-lg border-l-4 border-primary-yellow hover:bg-bg-dark-secondary/80 transition duration-300 cursor-pointer transform hover:translate-x-1">
+                    <p class="text-sm text-text-soft">Sep 15, 2025</p>
+                    <h4 class="text-xl font-serif font-bold hover:text-primary-yellow transition duration-300">
+                        New Packaging: Sustainable Luxury is Our Promise
+                    </h4>
+                </div>
+            </div>
+            <a href="#blog" class="mt-8 inline-block text-primary-yellow font-semibold relative before:content-['→'] before:absolute before:-right-4 before:opacity-0 hover:before:opacity-100 before:transition-all before:duration-300 hover:pr-5">View All News</a>
+        </div>
+
+        <!-- TESTIMONIALS (Right Column) -->
+        <div class="px-4 sm:px-6 lg:px-8 bg-bg-charcoal">
+            <p class="text-lg text-primary-yellow font-serif uppercase tracking-widest mb-2">Rave Reviews</p>
+            <h2 class="text-5xl font-serif font-black mb-10">What Clients Say</h2>
+
+            <div class="space-y-8">
+                <!-- Testimonial 1: Added glow-shadow class -->
+                <div class="p-6 bg-bg-dark-secondary rounded-xl italic text-text-soft border-l-4 border-primary-yellow/70 shadow-lg glow-shadow">
+                    <p class="mb-4">"The Wagyu kit was simply exceptional. Every step felt like a chef's secret revealed. This isn't just a meal kit; it's a culinary education."</p>
+                    <p class="not-italic font-bold text-text-light">- Anya M., New York</p>
+                </div>
+                <!-- Testimonial 2 -->
+                <div class="p-6 bg-bg-dark-secondary rounded-xl italic text-text-soft border-l-4 border-primary-yellow/70 shadow-lg">
+                    <p class="mb-4">"We saved $500 on dinner reservations and had more fun making the Saffron Tagliatelle at home. The quality of the ingredients is unmatched."</p>
+                    <p class="not-italic font-bold text-text-light">- David L., London</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+
+    <!-- ======================================== -->
+    <!-- 11. FOOTER -->
+    <!-- ======================================== -->
+    <footer class="bg-bg-charcoal border-t border-gray-800 py-12" id="contact">
+        <div class="container mx-auto px-4 sm:px-6 lg:px-8 grid grid-cols-2 md:grid-cols-4 gap-8">
+
+            <!-- Column 1: Logo & Mission -->
+            <div class="col-span-2 md:col-span-1">
+                <a href="#" class="logo-text font-serif font-black text-primary-yellow mb-4 block">FlavorForge</a>
+                <p class="text-text-soft text-sm">
+                    Bringing the artistry of Michelin-starred dining into your kitchen, effortlessly.
+                </p>
+            </div>
+
+            <!-- Column 2: Quick Links -->
+            <div>
+                <h4 class="text-lg font-bold mb-4 text-text-light">Quick Links</h4>
+                <ul class="space-y-2 text-text-soft text-sm">
+                    <li><a href="#services" class="hover:text-primary-yellow transition">Our Services</a></li>
+                    <li><a href="#menu" class="hover:text-primary-yellow transition">Monthly Menu</a></li>
+                    <li><a href="#plans" class="hover:text-primary-yellow transition">Subscription Plans</a></li>
+                    <li><a href="#blog" class="hover:text-primary-yellow transition">Culinary Blog</a></li>
+                </ul>
+            </div>
+
+            <!-- Column 3: Contact -->
+            <div>
+                <h4 class="text-lg font-bold mb-4 text-text-light">Contact Us</h4>
+                <ul class="space-y-2 text-text-soft text-sm">
+                    <li>Email: <a href="mailto:chef@flavorforge.com" class="hover:text-primary-yellow transition">chef@flavorforge.com</a></li>
+                    <li>Phone: +1 800-FORGE-IT</li>
+                    <li>Address: 10 Culinary Row, Paris, France</li>
+                </ul>
+            </div>
+
+            <!-- Column 4: Newsletter -->
+            <div>
+                <h4 class="text-lg font-bold mb-4 text-text-light">Join Our Newsletter</h4>
+                <p class="text-text-soft text-sm mb-4">
+                    Get exclusive previews of rare ingredients and new recipes.
+                </p>
+                <form>
+                    <input type="email" placeholder="Your Email" class="w-full p-3 bg-bg-dark-secondary border border-gray-700 rounded-lg text-text-light mb-3 focus:border-primary-yellow focus:ring-1 focus:ring-primary-yellow">
+                    <button type="submit" class="w-full py-3 bg-primary-yellow text-bg-charcoal font-bold rounded-lg hover:bg-secondary-yellow transition duration-300">
+                        Subscribe
+                    </button>
+                </form>
+            </div>
+        </div>
+
+        <div class="mt-12 pt-8 border-t border-gray-800 text-center">
+            <p class="text-text-soft text-sm">&copy; 2025 FlavorForge. All rights reserved. | Crafted with Passion.</p>
+        </div>
+    </footer>
+
+</body>
+
+</html>
